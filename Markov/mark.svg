@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
 
-<svg id="svg_elem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- <circle id="stateA" cx="50" cy="100" r="30" fill="lightblue" stroke="black" stroke-width="2"/>
-    <text x="50" y="105" font-family="Arial" font-size="16" text-anchor="middle" fill="black">A</text>
-    <circle id="stateB" cx="150" cy="50" r="30" fill="lightgreen" stroke="black" stroke-width="2"/>
-    <text x="150" y="55" font-family="Arial" font-size="16" text-anchor="middle" fill="black">B</text>
-    <circle id="stateC" cx="250" cy="100" r="30" fill="lightcoral" stroke="black" stroke-width="2"/>
-    <text x="250" y="105" font-family="Arial" font-size="16" text-anchor="middle" fill="black">C</text>
-    <line id="lineAtoB" x1="60" y1="100" x2="120" y2="60" stroke="black" stroke-width="2" marker-end="url(#arrow)"/>
-    <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L0,6 L9,3 z" fill="black"/>
-        </marker>
-    </defs>
-    <animate xlink:href="#lineAtoB" attributeName="x2" from="60" to="120" dur="2s" begin="0s" fill="freeze"/>
-    <animate xlink:href="#lineAtoB" attributeName="y2" from="100" to="60" dur="2s" begin="0s" fill="freeze"/> -->
+<svg id="svg_elem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1000" width="1500" height="1000" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs>
         <style type="text/css">@import url('https://fonts.googleapis.com/css?family=Lato|Open+Sans|Oswald|Raleway|Roboto|Indie+Flower|Gamja+Flower');</style>
-        <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L0,6 L9,3 z" fill="black"/>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="context-stroke"/>
         </marker>
     </defs>
-    <rect id="border" width="500" height="500" fill="none" stroke="black" stroke-width="2"/>
+    
+    <rect id="border" width="1000" height="1000" fill="none" stroke="black" stroke-width="2"/>
     <script href="script.js"/>
 </svg>
