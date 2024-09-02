@@ -2,8 +2,8 @@ let n = 4; // nodes
 let m = 4; // edges
 
 // height and width of simulation box
-let height = 500;
-let width = 500;
+let height = 1000;
+let width = 1000;
 // edge_weights[i][j] = prob of node i to node j
 let edge_weights = [
     [0, 0.2, 0.5, 0.3],
@@ -36,33 +36,37 @@ for (let i = 0; i < n; i++) {
         if (edge_weights[i][j] > 0) {
             let curve = document.createElementNS("http://www.w3.org/2000/svg", "path");
             let x1 = width/2 + radius_circle * Math.cos(2 * Math.PI * i / n);
-            x1 -= (radius_node) * Math.cos(2 * Math.PI * i / n);
             let y1 = height/2 + radius_circle * Math.sin(2 * Math.PI * i / n);
-            y1 -= (radius_node) * Math.sin(2 * Math.PI * i / n);
             let x2 = width/2 + radius_circle * Math.cos(2 * Math.PI * j / n);
-            x2 -= (radius_node) * Math.cos(2 * Math.PI * j / n);
             let y2 = height/2 + radius_circle * Math.sin(2 * Math.PI * j / n);
-            y2 -= (radius_node) * Math.sin(2 * Math.PI * j / n);
+            let angle = Math.atan2(y2 - y1, x2 - x1);
+            x1 += radius_node * Math.cos(angle);
+            y1 += radius_node * Math.sin(angle);
+            x2 -= radius_node * Math.cos(angle);
+            y2 -= radius_node * Math.sin(angle);
 
             if(i == j) {
-                let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", x1);
-                circle.setAttribute("cy", y1);
-                circle.setAttribute("r", radius_node + 5);
-                circle.setAttribute("fill", "none");
-                circle.setAttribute("stroke", "green");
-                circle.setAttribute("stroke-width", 4);
-                svg_element.appendChild(circle);
-                lines.push(circle);
+                let dx = x2 - x1;
+                let dy = y2 - y1;
+                let dr = Math.sqrt(dx * dx + dy * dy);
+                curve.setAttribute("d", "M " + x1 + " " + y1 + " A " + dr + " " + dr + " 0 1 0 " + " " + x2 + " " + y2);
+                curve.setAttribute("marker-end", "url(#arrow)");
+                curve.setAttribute("fill", "none");
+                curve.setAttribute("stroke", "green");
+                curve.setAttribute("stroke-width", 4);
+                
+                svg_element.appendChild(curve);
+                lines.push(curve);
             } else {
                 let dx = x2 - x1;
                 let dy = y2 - y1;
                 let dr = Math.sqrt(dx * dx + dy * dy);
                 curve.setAttribute("d", "M " + x1 + " " + y1 + " A " + dr + " " + dr + " 0 0 0 " + " " + x2 + " " + y2);
+                curve.setAttribute("marker-end", "url(#arrow)");
                 curve.setAttribute("fill", "none");
                 curve.setAttribute("stroke", "green");
                 curve.setAttribute("stroke-width", 4);
-                // curve.setAttribute("marker-end", "url(#arrow)");
+                
                 svg_element.appendChild(curve);
                 lines.push(curve);
             }
@@ -76,11 +80,11 @@ for (let i = 0; i < n; i++) {
     circle.setAttribute("cy", height/2 + radius_circle * Math.sin(2 * Math.PI * i / n));
     circle.setAttribute("r", radius_node);
     circle.setAttribute("fill", "red");
+    circle.setAttribute("fill-opacity", 0.5);
     circle.setAttribute("stroke", "black");
     circle.setAttribute("stroke-width", 4);
     svg_element.appendChild(circle);
     nodes.push(circle);
-    console.log("Node " + i+1 + " is at (" + circle.getAttribute("cx") + ", " + circle.getAttribute("cy") + ")");
 
     let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", width/2 + radius_circle * Math.cos(2 * Math.PI * i / n) - 5);
@@ -104,27 +108,26 @@ for (let i = 0; i < 100; i++) {
 
 // draw simulation animations
 let delay = 1000;
-let hold = delay * 0.8;
 for (let i = 0; i < length_sim; i++) {
     let set = document.createElementNS("http://www.w3.org/2000/svg", "set");
     set.setAttribute("attributeName", "fill");
     set.setAttribute("to", "blue");
     set.setAttribute("begin", delay * i + "ms");
-    set.setAttribute("dur", hold + "ms");
+    set.setAttribute("dur", delay + "ms");
     set.setAttribute("fill", "freeze");
     nodes[sim_data[i]].appendChild(set);
     let reset = document.createElementNS("http://www.w3.org/2000/svg", "set");
     reset.setAttribute("attributeName", "fill");
     reset.setAttribute("to", "red");
     reset.setAttribute("begin", delay * (i+1) + "ms");
-    reset.setAttribute("dur", hold + "ms");
+    reset.setAttribute("dur", delay + "ms");
     reset.setAttribute("fill", "freeze");
     nodes[sim_data[i]].appendChild(reset);
 }
 
 // draws transition table
 let table = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-table.setAttribute("x", 500);
+table.setAttribute("x", width);
 table.setAttribute("y", 0);
 table.setAttribute("width", 400);
 table.setAttribute("height", 300);
@@ -134,7 +137,7 @@ table.setAttribute("stroke-width", 2);
 svg_element.appendChild(table);
 
 let table_title = document.createElementNS("http://www.w3.org/2000/svg", "text");
-table_title.setAttribute("x", 550);
+table_title.setAttribute("x", width + 50);
 table_title.setAttribute("y", 50);
 table_title.setAttribute("fill", "black");
 table_title.setAttribute("font-size", "30");
@@ -148,7 +151,7 @@ text_els = [];
 for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
         let table_text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        table_text.setAttribute("x", 550+100 * j);
+        table_text.setAttribute("x", width+50 + 100 * j);
         table_text.setAttribute("y", 100+50 * i);
         table_text.setAttribute("fill", "black");
         table_text.setAttribute("font-size", "20");
@@ -160,33 +163,34 @@ for (let i = 0; i < n; i++) {
     }
 }
 // animates table
+let phase_shift = 0.4*delay;
 for (let i = 0; i < length_sim; i++) {
     let set = document.createElementNS("http://www.w3.org/2000/svg", "set");
     set.setAttribute("attributeName", "fill");
     set.setAttribute("to", "yellow");
-    set.setAttribute("begin", delay * i + "ms");
-    set.setAttribute("dur", hold + "ms");
+    set.setAttribute("begin", phase_shift + delay * i + "ms");
+    set.setAttribute("dur", delay + "ms");
     set.setAttribute("fill", "freeze");
-    text_els[sim_data[i] + sim_data[i+1] * n].appendChild(set);
+    text_els[sim_data[i]*n + sim_data[i+1]].appendChild(set);
     let reset = document.createElementNS("http://www.w3.org/2000/svg", "set");
     reset.setAttribute("attributeName", "fill");
     reset.setAttribute("to", "black");
-    reset.setAttribute("begin", delay * i + hold + "ms");
-    reset.setAttribute("dur", hold + "ms");
+    reset.setAttribute("begin", delay * (i+1) + "ms");
+    reset.setAttribute("dur", delay - phase_shift + "ms");
     reset.setAttribute("fill", "freeze");
-    text_els[sim_data[i] + sim_data[i+1] * n].appendChild(reset);
+    text_els[sim_data[i]*n + sim_data[i+1]].appendChild(reset);
     let set2 = document.createElementNS("http://www.w3.org/2000/svg", "set");
     set2.setAttribute("attributeName", "stroke");
     set2.setAttribute("to", "yellow");
-    set2.setAttribute("begin", delay * i + "ms");
-    set2.setAttribute("dur", hold + "ms");
+    set2.setAttribute("begin", phase_shift + delay * i + "ms");
+    set2.setAttribute("dur", delay + "ms");
     set2.setAttribute("fill", "freeze");
-    lines[sim_data[i] + sim_data[i+1] * n].appendChild(set2);
+    lines[sim_data[i]*n + sim_data[i+1]].appendChild(set2);
     let reset2 = document.createElementNS("http://www.w3.org/2000/svg", "set");
     reset2.setAttribute("attributeName", "stroke");
     reset2.setAttribute("to", "green");
-    reset2.setAttribute("begin", delay * i + hold + "ms");
-    reset2.setAttribute("dur", hold + "ms");
+    reset2.setAttribute("begin", delay * (i+1) + "ms");
+    reset2.setAttribute("dur", delay - phase_shift+ "ms");
     reset2.setAttribute("fill", "freeze");
-    lines[sim_data[i] + sim_data[i+1] * n].appendChild(reset2);
+    lines[sim_data[i]*n + sim_data[i+1]].appendChild(reset2);
 }
