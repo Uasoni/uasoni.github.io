@@ -107,6 +107,7 @@ for(let i = 0; i < num_moves; i++) {
 
         if(inside(nx, ny) && !filled[nx][ny]) {
             // console.log(nx, ny);
+            // console.log(ny * n + nx + 1);
 
             filled[loc[piece][0]][loc[piece][1]] = false;
             filled[nx][ny] = true;
@@ -123,7 +124,7 @@ for(let i = 0; i < num_moves; i++) {
             document.getElementById(piece).appendChild(filled_anim);
 
             let color = "";
-            if(ny * n + nx + 1 == parseInt(piece)) {
+            if(nx * n + ny + 1 == parseInt(piece)) {
                 color = "#DEE7BE";
             } else {
                 color = "#E7CACA";
@@ -155,8 +156,6 @@ for(let i = 0; i < num_moves; i++) {
         if(has_moved) break;
     }
     if(!has_moved) {
-        console.log("Invalid move");
-
         let invalid_anim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
         invalid_anim.setAttribute("attributeName", "fill");
         invalid_anim.setAttribute("to", "#F72424");
