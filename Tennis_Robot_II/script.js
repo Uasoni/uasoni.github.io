@@ -89,7 +89,7 @@ function move_ball(i, j) {
 }
 
 let move_num = -1;
-for(let i = 0; i <= 100000000; i++) {
+for(let i = 0; i <= 10000; i++) {
     move_num++;
     if(move_num >= m) move_num = 0;
 
