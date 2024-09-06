@@ -2,7 +2,7 @@ let svg = document.getElementById("svg_elem");
 let width = svg.getAttribute("width");
 let height = svg.getAttribute("height");
 
-let n = 10, k = 3;
+let n = 18, k = 5;
 
 let table = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 table.setAttribute("r", width*0.25);
@@ -26,13 +26,13 @@ for(let i = 1; i <= n; i++) {
     svg.appendChild(text);
 }
 
-let ppos = [0, 3, 4, 6, 8];
+let ppos = [0, 3, 4, 6, 8, 9, 17];
 let people = [0];
 let people_objects = [null];
 let chairs = [0];
 let person_done = [false, false, false, false, false, false];
 let chair_done = [false, false, false, false, false];
-let cpos = [0, 2, 5, 8];
+let cpos = [0, 1, 2, 5, 10, 16];
 let chair_rad = 30;
 let outer_rad = width * 0.3
 for(let i = 1; i <= k; i++) {
