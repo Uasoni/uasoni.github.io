@@ -64,8 +64,7 @@ function update_arrows(arrow, start, end) {
 }
 
 function swap(i, j) {
-    let tmp = array[i];
-    array[i] = array[j], array[j] = tmp;
+    [array[i], array[j]] = [array[j], array[i]];
     let swap_1 = document.createElementNS("http://www.w3.org/2000/svg", "animate");
     swap_1.setAttribute("attributeName", "x");
     swap_1.setAttribute("to", calc_x(j));
@@ -84,8 +83,7 @@ function swap(i, j) {
     rects[j].appendChild(swap_2);
 
     t++;
-    let tmpr = rects[i];
-    rects[i] = rects[j], rects[j] = tmpr;
+    [rects[i], rects[j]] = [rects[j], rects[i]];
 }
 
 function partition(l, r) {
