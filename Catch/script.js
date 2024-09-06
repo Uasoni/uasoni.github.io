@@ -3,13 +3,18 @@ let width = svg.getAttribute("width");
 let height = svg.getAttribute("height");
 
 let radius = 300;
-let n = 3; // num balls
-let m = 5; // num people
+let n = 5; // num balls
+let m = 15; // num people
 let moves = [
-    [1, 5, 3, 2, 4, 3, 1, 4, 2],
-    [5, 4, 5, 3, 2, 4, 1, 3, 1],
-    [2, 3, 2, 4, 1, 5, 3, 2, 5]
+    // i would manually put a test case here
 ];
+
+for(let i = 0; i < n; i++) {
+    moves.push([]);
+    for(let j = 0; j < 20; j++) {
+        moves[i].push(Math.floor(Math.random() * m) + 1);
+    }
+}
 
 // draw circles
 let circle_rad = 30;
@@ -89,6 +94,26 @@ let t = 0;
 let dt = 10;
 let EPS = 1;
 let finished = 0;
+
+function do_set(i, t) {
+    let set_x = document.createElementNS("http://www.w3.org/2000/svg", "set");
+    set_x.setAttribute("attributeName", "cx");
+    set_x.setAttribute("to", pos[i][0]);
+    set_x.setAttribute("begin", t+dt + "ms");
+    set_x.setAttribute("dur", dt + "ms");
+    set_x.setAttribute("fill", "freeze");
+    let set_y = document.createElementNS("http://www.w3.org/2000/svg", "set");
+    set_y.setAttribute("attributeName", "cy");
+    set_y.setAttribute("to", pos[i][1]);
+    set_y.setAttribute("begin", t+dt + "ms");
+    set_y.setAttribute("dur", dt + "ms");
+    set_y.setAttribute("fill", "freeze");
+
+    balls[i].appendChild(set_x);
+    balls[i].appendChild(set_y);
+}
+
+
 for(t = 0; finished < n; t += dt) {
     for(let i = 0; i < n; i++) {
         if(marked_done[i]) continue;
@@ -126,6 +151,7 @@ for(t = 0; finished < n; t += dt) {
             if(ids[i] >= moves[i].length) {
                 marked_done[i] = true;
                 finished++;
+                do_set(i, t);
                 continue;
             }
 
@@ -134,6 +160,7 @@ for(t = 0; finished < n; t += dt) {
             if(new_target_id == null) {
                 marked_done[i] = true;
                 finished++;
+                do_set(i, t);
                 continue;
             }
             let new_target_pos = [parseFloat(new_target_id.getAttribute("cx")), parseFloat(new_target_id.getAttribute("cy"))];
@@ -176,22 +203,4 @@ for(t = 0; finished < n; t += dt) {
             }
         }
     }
-}
-
-for(let i = 0; i < n; i++) {
-    let set_x = document.createElementNS("http://www.w3.org/2000/svg", "set");
-    set_x.setAttribute("attributeName", "cx");
-    set_x.setAttribute("to", pos[i][0]);
-    set_x.setAttribute("begin", t+dt + "ms");
-    set_x.setAttribute("dur", dt + "ms");
-    set_x.setAttribute("fill", "freeze");
-    let set_y = document.createElementNS("http://www.w3.org/2000/svg", "set");
-    set_y.setAttribute("attributeName", "cy");
-    set_y.setAttribute("to", pos[i][1]);
-    set_y.setAttribute("begin", t+dt + "ms");
-    set_y.setAttribute("dur", dt + "ms");
-    set_y.setAttribute("fill", "freeze");
-
-    balls[i].appendChild(set_x);
-    balls[i].appendChild(set_y);
 }
