@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 1D TDSE Simulation
+date: 2025-01-24
 tags: [Quantum, Computational Physics]
 ---
 
