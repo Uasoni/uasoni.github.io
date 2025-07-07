@@ -1,7 +1,6 @@
 ---
 layout: post
 title: Special Relativity - Invariant Interval
-date: 2025-02-03
 tags: [SR, Notes]
 ---
 

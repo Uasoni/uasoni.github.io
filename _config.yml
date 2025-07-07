@@ -19,6 +19,19 @@ exclude:
   - LICENSE
   - docker-compose.yml
 
+posts:
+  enabled: true
+  permalink: /:title:output_ext
+
+# Collections
+# collections:
+#   posts:
+#     output: true
+#     permalink: /:collection/:title:output_ext
+#   projects:
+#     output: true
+#     permalink: /:collection/:title:output_ext
+
 # Plugins
 plugins:
   - jekyll-seo-tag
