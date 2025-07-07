@@ -1,0 +1,24 @@
+title: Uasoni
+description:
+baseurl: ""
+url: https://uasoni.github.io
+
+# Site Settings
+author:
+  name: Austin Song
+  email: n/a
+photo: /assets/images/profile.jpg
+
+# Social Media
+social:
+  github: uasoni
+
+# Build Settings
+exclude:
+  - README.md
+  - LICENSE
+  - docker-compose.yml
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
