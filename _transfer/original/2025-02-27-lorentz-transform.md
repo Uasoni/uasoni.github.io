@@ -31,7 +31,7 @@ Can write all of these in alternate forms by switching frames (i.e. $\Delta x \l
 
 Lorentz transformation currently introduced maps points in $S'$ to corresponding points in $S$. A **passive transformation** looks at mapping the *axes* of $S'$ onto the coordinate space of $S$ - i.e. where $S'$ would lie if superimposed onto $S$.
 
-This can be achieved with basic linear algebra; looking at the Lorentz transform matrix, $\begin{bmatrix}1\\0\end{bmatrix}$ (in $S'$) maps to $\begin{bmatrix}\gamma\\v\gamma\end{bmatrix}$ (in $S$) and $\begin{bmatrix}0\\1\end{bmatrix}$ maps to $\begin{bmatrix}v\gamma\\\gamma\end{bmatrix}$. In textbooks which don't use natural units the $ct$ axis is introduced (instead of the $t$ axis), with the matrix $$\begin{bmatrix}x\\ct\end{bmatrix}=\begin{bmatrix}\gamma&\beta\gamma\\\beta\gamma&\gamma\end{bmatrix}\begin{bmatrix}x'\\ct'\end{bmatrix}$$
+This can be achieved with basic linear algebra; looking at the Lorentz transform matrix, $\begin{bmatrix}1\\ 0\end{bmatrix}$ (in $S'$) maps to $\begin{bmatrix}\gamma\\v\gamma\end{bmatrix}$ (in $S$) and $\begin{bmatrix}0\\1\end{bmatrix}$ maps to $\begin{bmatrix}v\gamma\\\gamma\end{bmatrix}$. In textbooks which don't use natural units the $ct$ axis is introduced (instead of the $t$ axis), with the matrix $$\begin{bmatrix}x\\ct\end{bmatrix}=\begin{bmatrix}\gamma&\beta\gamma\\\beta\gamma&\gamma\end{bmatrix}\begin{bmatrix}x'\\ct'\end{bmatrix}$$
 representing the Lorentz transform, and yielding $(1,0)\rightarrow(\gamma,\beta\gamma)$, etc.
 
 It is algebraically obvious that since $\mathbf L$ is symmetric, $\tan\theta_1=\tan\theta_2$ where $\theta_1,\theta_2$ are the angles between the $S'$ x/y axes to the $S$ x/y axes respectively.

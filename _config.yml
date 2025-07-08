@@ -23,6 +23,9 @@ posts:
   enabled: true
   permalink: /:title:output_ext
 
+kramdown:
+  parse_span_html: false
+
 # Collections
 # collections:
 #   posts:
