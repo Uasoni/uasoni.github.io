@@ -1,0 +1,292 @@
+<head>
+    <!-- MathJax Configuration -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+    <script type="text/javascript">
+        MathJax = {
+            tex: { // this is just how Jekyll outputs different math delimiters :(
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+</head>
+
+<article>
+    <main>
+        <h1 class="post-title">1D TDSE Simulation</h1>
+        <time datetime="2025-01-24T00:00:00+11:00" class="post-date">January 24, 2025</time>
+        <p class="lead"></p>
+        <h2 id="theory">Theory</h2>
+
+<p>Similar to the 2D TDSE setup:</p>
+
+<div>
+$$i\hbar\frac{d}{dt}\ket{\psi}=\hat{H}\ket{\psi}$$
+</div>
+
+<p>Doing much the same theoretical setup (<span class="inline-math">$\hbar=2m=1$</span>):</p>
+
+<div>
+$$i\frac{d}{dt} \psi(x,t) =(-\nabla^2+V(x)) \psi(x,t) \implies i\frac{d}{dt} \psi= - \frac{\partial^2 u}{\partial x^2}+V\psi$$
+</div>
+
+<p>And for this problem quite clearly <span class="inline-math">$\nabla^2$</span> represented in matrix form as</p>
+
+<div>
+$$
+\nabla^2 \equiv
+\begin{bmatrix}
+-2 &amp; 1 &amp; 0 &amp; \cdots &amp; 0 \\
+1 &amp; -2 &amp; 1 &amp; \cdots &amp; 0 \\
+0 &amp; 1 &amp; -2 &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; 0 &amp; \cdots &amp; -2
+\end{bmatrix}
+$$
+</div>
+
+<p>The Gaussian wave-packet is</p>
+
+<div>
+$$\psi_0=\frac{1}{\sigma\sqrt{2\pi}}e^{\displaystyle-\frac{(x-x_0)^2}{2\sigma^2}+ip_0(x-x_0)}$$
+</div>
+
+<p>where <span class="inline-math">$p_0$</span> is initial <span class="inline-math">$x$</span> momentum.</p>
+
+<h2 id="testing">Testing</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">scipy.integrate</span> <span class="k">as</span> <span class="n">spi</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="n">spla</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="n">sps</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="n">animation</span>
+
+<span class="n">INF</span> <span class="o">=</span> <span class="mf">1e10</span>
+
+<span class="c1"># --- PARAMETERS ---
+</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">1.0</span>                 <span class="c1"># domain size: [0,1]
+</span><span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>                 <span class="c1"># resolution
+</span><span class="n">T</span> <span class="o">=</span> <span class="mi">5</span>                   <span class="c1"># final time
+</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.01</span>              <span class="c1"># time step
+</span>
+<span class="k">def</span> <span class="nf">read_data</span><span class="p">():</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"sim.in"</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">det</span><span class="p">.</span><span class="n">readline</span><span class="p">().</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">det</span><span class="p">.</span><span class="n">readline</span><span class="p">().</span><span class="n">split</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span>
+<span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">read_data</span><span class="p">()</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># --- SPACE ---
+</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">init_psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">p0</span><span class="p">):</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">gauss</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1j</span> <span class="o">*</span> <span class="n">p0</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">norm</span> <span class="o">*</span> <span class="n">gauss</span> <span class="o">*</span> <span class="n">phase</span>
+<span class="k">def</span> <span class="nf">well</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># --- INITIALISE PSI/V ---
+</span>
+<span class="n">psi</span> <span class="o">=</span> <span class="p">[</span><span class="n">init_psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="n">pi</span><span class="p">)]</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">well</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># --- CREATE LAPLACIAN OPERATOR ---
+</span>
+<span class="k">def</span> <span class="nf">laplacian_1d</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">L1D</span> <span class="o">=</span> <span class="n">sps</span><span class="p">.</span><span class="n">diags</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">L</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">L1D</span>
+<span class="n">L1D</span> <span class="o">=</span> <span class="n">laplacian_1d</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># --- TIME INTEGRATION ---
+</span>
+<span class="k">def</span> <span class="nf">dpsi_dt</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">L1D</span> <span class="o">+</span> <span class="n">sps</span><span class="p">.</span><span class="n">diags</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">)</span>
+    <span class="n">psi_new</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1j</span> <span class="o">*</span> <span class="n">H</span> <span class="o">@</span> <span class="n">psi</span>
+    <span class="c1"># psi_new[0] = psi_new[-1] = 0
+</span>    <span class="k">return</span> <span class="n">psi_new</span>
+
+<span class="n">sol</span> <span class="o">=</span> <span class="n">spi</span><span class="p">.</span><span class="n">solve_ivp</span><span class="p">(</span><span class="n">dpsi_dt</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">y0</span><span class="o">=</span><span class="n">psi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t_eval</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s">'RK23'</span><span class="p">)</span>
+<span class="n">psi</span> <span class="o">=</span> <span class="n">sol</span><span class="p">.</span><span class="n">y</span><span class="p">.</span><span class="n">T</span>
+</code></pre></div></div>
+
+<div style="text-align:center">
+  <img src="/assets/images/1D_TDSE_sim_1.gif" alt="1D_TDSE_sim_1.gif" width="400px" />
+</div>
+
+<p>Unsurprisingly the same instability emerges. This could be because of resolution, both in terms of time and space (<span class="inline-math">$dx,dt\to 0$</span> for perfect simulation), but this is untested since my program cannot run anything better than <span class="inline-math">$dx=\frac{L}{N}=\frac{1}{100}\text{ m},\,dt=10^{-2}\text{ s}$</span>.</p>
+
+<p>After testing for various bugs I figured I could probably combat the issue just by increasing domain size, so that’s what I did.</p>
+
+<blockquote>
+  <p>Turns out performing the Dirichlet boundary conditions (<span class="inline-math">$\psi(0)=\psi(t)=0$</span>) explicitly is not necessary; the Laplacian does it automatically; and by not explicitly setting <code class="language-plaintext highlighter-rouge">psi</code> to 0, the peaks in the simulation disappear.</p>
+
+</blockquote>
+<div style="text-align:center">
+  <img src="/assets/images/1D_TDSE_sim_2.gif" alt="1D_TDSE_sim_2.gif" width="400px" />
+</div>
+
+<blockquote>
+
+  <p>The simulation actually looks alright. I believe the only issue is <span class="inline-math">$L = 1.0$</span> is too small since the wave spreads pretty quickly.</p>
+</blockquote>
+
+<p>By increasing <span class="inline-math">$L = 10.0\text{ m}$</span> while retaining <span class="inline-math">$\frac{L}{N}=10^{-2}\implies N=1000$</span>, we obtain:</p>
+
+<div style="text-align:center">
+  <img src="/assets/images/1D_TDSE_sim_3.gif" alt="1D_TDSE_sim_3.gif" width="400px" />
+</div>
+
+<p>I’m not sure that this is correct. <em>Hint:</em> Turns out it’s correct.</p>
+
+<p>The wave spreading can be controlled by setting <span class="inline-math">$\sigma$</span> to be larger, say <span class="inline-math">$\sigma=1$</span>. Graphing the modulus of the wave gives a nice result.</p>
+
+<div style="text-align:center">
+  <img src="/assets/images/1D_TDSE_sim_4.gif" alt="1D_TDSE_sim_4.gif" width="400px" />
+</div>
+
+<p>I’m happy with this so I’ll try a couple potential functions and then call this project.</p>
+
+<h2 id="simulations">Simulations</h2>
+
+<h3 id="code">Code</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">scipy.integrate</span> <span class="k">as</span> <span class="n">spi</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="n">spla</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="n">sps</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="n">animation</span>
+
+<span class="n">INF</span> <span class="o">=</span> <span class="mf">1e10</span>
+
+<span class="c1"># --- PARAMETERS ---
+</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">10.0</span>                <span class="c1"># domain size: [0,1]
+</span><span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>                <span class="c1"># resolution
+</span><span class="n">T</span> <span class="o">=</span> <span class="mi">2</span>                   <span class="c1"># final time
+</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.01</span>               <span class="c1"># time step
+</span>
+<span class="k">def</span> <span class="nf">read_data</span><span class="p">():</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"sim.in"</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">det</span><span class="p">.</span><span class="n">readline</span><span class="p">().</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">det</span><span class="p">.</span><span class="n">readline</span><span class="p">().</span><span class="n">split</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span>
+<span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">read_data</span><span class="p">()</span>
+
+<span class="c1"># --- SPACE ---
+</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">init_psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">p0</span><span class="p">):</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">gauss</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1j</span> <span class="o">*</span> <span class="n">p0</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">norm</span> <span class="o">*</span> <span class="n">gauss</span> <span class="o">*</span> <span class="n">phase</span>
+<span class="k">def</span> <span class="nf">well</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># --- INITIALISE PSI/V ---
+</span>
+<span class="n">psi0</span> <span class="o">=</span> <span class="n">init_psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">well</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># --- CREATE LAPLACIAN OPERATOR ---
+</span>
+<span class="k">def</span> <span class="nf">laplacian_1d</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">L1D</span> <span class="o">=</span> <span class="n">sps</span><span class="p">.</span><span class="n">diags</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">L</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">L1D</span>
+<span class="n">L1D</span> <span class="o">=</span> <span class="n">laplacian_1d</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># --- TIME INTEGRATION ---
+</span>
+<span class="k">def</span> <span class="nf">dpsi_dt</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mf">1j</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">L1D</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span> <span class="o">+</span> <span class="n">V</span> <span class="o">*</span> <span class="n">psi</span><span class="p">)</span>
+
+<span class="n">sol</span> <span class="o">=</span> <span class="n">spi</span><span class="p">.</span><span class="n">solve_ivp</span><span class="p">(</span><span class="n">dpsi_dt</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">y0</span><span class="o">=</span><span class="n">psi0</span><span class="p">,</span> <span class="n">t_eval</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s">'RK23'</span><span class="p">)</span>
+<span class="n">psi</span> <span class="o">=</span> <span class="n">sol</span><span class="p">.</span><span class="n">y</span><span class="p">.</span><span class="n">T</span>
+
+<span class="c1"># --- VISUALISE ---
+</span>
+<span class="k">def</span> <span class="nf">create_visual</span><span class="p">():</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="nb">all</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">psi</span><span class="p">)).</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.2</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="nb">all</span><span class="p">))</span>
+    <span class="n">line</span><span class="p">,</span> <span class="o">=</span> <span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'|ψ(x,t)|'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'Modulus |ψ(x,t)|'</span><span class="p">)</span>
+
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax</span><span class="p">.</span><span class="n">twinx</span><span class="p">()</span>
+    <span class="n">ax2</span><span class="p">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.2</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">V</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">ax2</span><span class="p">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'V(x)'</span><span class="p">)</span>
+    <span class="n">well_line</span><span class="p">,</span> <span class="o">=</span> <span class="n">ax2</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"V(x)"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"green"</span><span class="p">)</span>
+
+    <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">line</span><span class="p">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
+
+    <span class="n">time_txt</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="sa">f</span><span class="s">'t = </span><span class="si">{</span><span class="mi">0</span><span class="p">:.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="p">.</span><span class="n">transAxes</span><span class="p">,</span>
+                        <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s">'top'</span><span class="p">,</span>
+                        <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">line</span><span class="p">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
+        <span class="n">time_txt</span><span class="p">.</span><span class="n">set_text</span><span class="p">(</span><span class="sa">f</span><span class="s">'t = </span><span class="si">{</span><span class="n">i</span><span class="o">*</span><span class="n">dt</span><span class="p">:.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">line</span><span class="p">,</span> <span class="n">time_txt</span><span class="p">]</span>
+    
+    <span class="n">anim</span> <span class="o">=</span> <span class="n">animation</span><span class="p">.</span><span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">animate</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">psi</span><span class="p">),</span> <span class="n">interval</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">anim</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">'sim.gif'</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">create_visual</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>For all simulations, <span class="inline-math">$L=10.0\text{ m},\,N=10^3,\,dt=0.01,\,T=2\text{ s}$</span> unless otherwise specified.</p>
+
+<h3 id="infinite-square-well">Infinite Square Well</h3>
+
+<div>
+$$V(x)=\begin{cases}0 &amp; 0\leq x\leq L \\ \infty &amp; \text{otherwise}\end{cases}$$
+</div>
+
+<div style="text-align:center">
+  <img src="/assets/images/1D_TDSE_sim_5.gif" alt="1D_TDSE_sim_5.gif" />
+</div>
+
+<h3 id="heaviside">Heaviside</h3>
+
+<div>
+$$V(x)=\begin{cases}10 &amp; \frac{3L}{5}\leq x\leq \frac{4L}{5} \\ 0 &amp; x\in\left[ 0,\frac{3L}{5} \right) \cup \left( \frac{4L}{5},L \right] \\ \infty &amp; \text{otherwise}\end{cases}$$
+</div>
+
+<div style="text-align:center">
+  <img src="/assets/images/1D_TDSE_sim_6.gif" alt="1D_TDSE_sim_6.gif" />
+</div>
+
+<h3 id="funny-well-t5">Funny Well (<span class="inline-math">$T=5$</span>)</h3>
+
+<div>
+$$V(x)=\begin{cases} 2\left( x-\frac{L}{2} \right)^2 &amp; 0\leq x\leq L \\
+\infty &amp; \text{otherwise}\end{cases}$$
+</div>
+
+<div style="text-align:center">
+  <img src="/assets/images/1D_TDSE_sim_7.gif" alt="1D_TDSE_sim_7.gif" />
+</div>
+
+    </main>
+</article>

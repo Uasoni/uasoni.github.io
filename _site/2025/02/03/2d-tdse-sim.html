@@ -1,0 +1,335 @@
+<head>
+    <!-- MathJax Configuration -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+    <script type="text/javascript">
+        MathJax = {
+            tex: { // this is just how Jekyll outputs different math delimiters :(
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+</head>
+
+<article>
+    <main>
+        <h1 class="post-title">2D TDSE Simulation</h1>
+        <time datetime="2025-02-03T00:00:00+11:00" class="post-date">February  3, 2025</time>
+        <p class="lead"></p>
+        <h2 id="theory">Theory</h2>
+
+<p>Consider the TDSE:</p>
+
+<div>
+$$i\hbar \frac{d}{dt} | \psi \rangle = \hat H |\psi\rangle$$
+</div>
+
+<p>where <span class="inline-math">$|\psi\rangle \coloneqq \psi(x,y,t)$</span> for this problem.</p>
+
+<p>Expanding the Hamiltonian for non-relativistic particle:</p>
+
+<div>
+$$i\hbar\frac{d}{dt}\psi(x,y,t)=\left(-\frac{\hbar^2}{2m}\nabla^2+V(x,y,t)\right)\psi(x,y,t)$$
+</div>
+
+<p>Normalise and reduce dimensions (<span class="inline-math">$\hbar = 2m = 1, \psi(x,y,t) \rightarrow u(x,y,t)$</span>):</p>
+
+<div>
+$$i\frac{\partial u}{\partial t} = -\left(\frac{\partial^2u}{\partial x^2}+\frac{\partial^2u}{\partial y^2}\right)+v(x,y)u$$
+</div>
+
+<p>Noting also that <span class="inline-math">$p(x,y,t)=u(x,y,t)\bar u(x,y,t)$</span> and that for all <span class="inline-math">$t$</span>,</p>
+
+<div>
+$$\int_{-\infty}^\infty\int_{-\infty}^\infty p(x,y,t) \, \mathrm dx \,\mathrm dy =1$$
+</div>
+
+<p>The actual simulation can be done with the <a href="https://en.wikipedia.org/wiki/Crank%E2%80%93Nicolson_method">Crank-Nicolson</a> method for PDEs (essentially just implicit Runge-Kutta). However, easier to approximate roughly with Euler/explicit Runge-Kutta.</p>
+
+<p>We can do a simple rearrangement for the TSDE to get <span class="inline-math">$\frac{\partial u}{\partial t}$</span> alone:</p>
+
+<div>
+$$\frac{\partial u}{\partial t} = i\nabla^2 u - ivu$$
+</div>
+
+<p>The 1D discrete Laplacian for a rectangular cuboid domain (i.e. row of simulation points) can be represented in matrix form as</p>
+
+<div>
+$$\nabla^2\equiv\begin{bmatrix}-2&amp;1&amp;0&amp;0&amp;\cdots&amp;0\\1&amp;-2&amp;1&amp;0&amp;\cdots&amp;0\\0&amp;1&amp;-2&amp;1&amp;\cdots&amp;0\\0&amp;0&amp;1&amp;-2&amp;\cdots&amp;0\\\vdots&amp;\vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\0&amp;0&amp;0&amp;0&amp;\cdots&amp;-2\end{bmatrix}$$
+</div>
+
+<blockquote>
+  <p>Multidimensional discrete Laplacians on <a href="https://en.wikipedia.org/wiki/Cuboid#Rectangular_cuboid" title="Cuboid">rectangular cuboid</a> <a href="https://en.wikipedia.org/wiki/Regular_grid" title="Regular grid">regular grids</a> have very special properties, e.g., they are <a href="https://en.wikipedia.org/wiki/Kronecker_product#Kronecker_sum_and_exponentiation" title="Kronecker product">Kronecker sums</a> of one-dimensional discrete Laplacians. (See: <a href="https://en.wikipedia.org/wiki/Kronecker_sum_of_discrete_Laplacians">Kronecker sum of discrete Laplacians</a>)</p>
+</blockquote>
+
+<p>Therefore, we can construct the 2D (<span class="inline-math">$N^2\times N^2$</span> matrix) representing the 2D version of the above using the Kronecker product:</p>
+
+<div>
+$$\mathbf {A} \otimes \mathbf {B} ={\begin{bmatrix}a_{11}\mathbf {B} &amp;\cdots &amp;a_{1n}\mathbf {B} \\\vdots &amp;\ddots &amp;\vdots \\a_{m1}\mathbf {B} &amp;\cdots &amp;a_{mn}\mathbf {B} \end{bmatrix}}$$
+</div>
+
+<p>setting <span class="inline-math">$\mathbf L = \mathbf D_{\mathbf{xx}} \otimes \mathbf I_{\mathbf x} + \mathbf I_{\mathbf y} \otimes \mathbf D_{\mathbf{yy}}$</span> to be the 2D Laplacian where <span class="inline-math">$\mathbf D_{\mathbf{xx}}$</span> is the 1D discrete Laplacian in the x-direction, etc. (Note that <span class="inline-math">$\mathbf I_{\mathbf x},\mathbf I_{\mathbf y}$</span> has dimensions <span class="inline-math">$N\times N$</span> for this problem.)</p>
+
+<p>Whatever the Laplacian ends up being, we can ‘unroll’ <span class="inline-math">$u_t(x,y)$</span> into a dimensionality <span class="inline-math">$N^2$</span> vector, and applying the Hamiltonian on <span class="inline-math">$u_t$</span> becomes matrix-vector multiplication.</p>
+
+<p>Discretising and vectorizing with <span class="inline-math">$u(x,y,t) \rightarrow \mathbf u_t$</span>,</p>
+
+<div>
+$$\mathbf u_t = -i\cdot \Delta t \cdot(-\mathbf L + \mathbf V)\cdot \mathbf u_{t-1}$$
+</div>
+
+<h2 id="details">Details</h2>
+
+<p>Initial wavefunction was chosen to be a standard Gaussian wave packet, given by</p>
+
+<div>
+$$\psi(x,y,0)=\frac{1}{\sigma\sqrt{2\pi}} e^{\displaystyle-\frac{(x-x_0)^2+(y-y_0)^2}{4\sigma^2}+i(p_x(x-x_0)+p_y(y-y_0))}$$
+</div>
+
+<p>For this project, Python was chosen since it’s the least hassle for implementation (Hint: I am still just bad at implementation)</p>
+
+<p>The 2D Laplacian was computed with the following code:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">laplacian_2d</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+	<span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">)</span>
+	<span class="n">L1D</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">diag</span><span class="p">(</span><span class="n">e</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">diag</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="n">L2D</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">kron</span><span class="p">(</span><span class="n">L1D</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">L1D</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">L2D</span>
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>The Kronecker product is an expensive operation (by inspection <span class="inline-math">$\mathcal O(N^4)$</span>), but upon observation of the result, the 2D Laplacian (with Dirichlet boundary conditions) satisfies a very nice form (<em>Hint:</em> it [[#^1a1cb2</td>
+      <td>does not]] in fact satisfy this nice form):</td>
+    </tr>
+  </tbody>
+</table>
+
+<div>
+$$\nabla^2=\begin{bmatrix}-4&amp;1&amp;0&amp;0&amp;\cdots&amp;0\\1&amp;-4&amp;1&amp;0&amp;\cdots&amp;0\\0&amp;1&amp;-4&amp;1&amp;\cdots&amp;0\\0&amp;0&amp;1&amp;-4&amp;\cdots&amp;0\\\vdots&amp;\vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\0&amp;0&amp;0&amp;0&amp;\cdots&amp;-4\end{bmatrix}$$
+</div>
+
+<p>With this in mind we can optimise:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">laplacian_2d</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+	<span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">)</span>
+	<span class="n">L2D</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">diag</span><span class="p">(</span><span class="n">e</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">diag</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">L2D</span>
+</code></pre></div></div>
+
+<p>Unsurprisingly not only is this still slow (<span class="inline-math">$\mathcal O(N^4)$</span>) but also cannot support higher resolution grids (<span class="inline-math">$N &gt; 10^2$</span>). With <code class="language-plaintext highlighter-rouge">scipy.sparse</code> however the time complexity can be significantly optimised:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">laplacian_2d</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+	<span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">)</span>
+	<span class="n">L2D</span> <span class="o">=</span> <span class="n">sps</span><span class="p">.</span><span class="n">diags</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">e</span><span class="p">,</span> <span class="n">e</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">:]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">),</span>
+		<span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">L2D</span>
+</code></pre></div></div>
+<p>Construction is now <span class="inline-math">$\mathcal O(N)$</span> since we add <span class="inline-math">$\sim N$</span> non-zero entries.</p>
+
+<p>Time evolution is just rewriting the discretisation into code:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">time_evolution</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<span class="err"> </span> <span class="err"> </span> <span class="n">H</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">L2D</span> <span class="o">+</span> <span class="n">sps</span><span class="p">.</span><span class="n">diags</span><span class="p">(</span><span class="n">V</span><span class="p">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">)</span>
+<span class="err"> </span> <span class="err"> </span> <span class="n">psi_new</span> <span class="o">=</span> <span class="n">psi</span><span class="p">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">-</span> <span class="mf">1j</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">H</span> <span class="o">@</span> <span class="n">psi</span><span class="p">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="err"> </span> <span class="err"> </span> <span class="k">return</span> <span class="n">psi_new</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</code></pre></div></div>
+<p>And for calling the function, save every <code class="language-plaintext highlighter-rouge">save_interval</code> steps since thousands of animation frames aren’t required and memory is saved so longer simulations can be run:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">curr_psi</span> <span class="o">=</span> <span class="n">psi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">save_interval</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">/</span><span class="n">dt</span><span class="p">)):</span>
+<span class="err"> </span> <span class="err"> </span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Step </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s">/</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">/</span><span class="n">dt</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="err"> </span> <span class="err"> </span> <span class="n">psi_new</span> <span class="o">=</span> <span class="n">time_evolution</span><span class="p">(</span><span class="n">curr_psi</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+<span class="err"> </span> <span class="err"> </span> <span class="n">psi_new</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">psi_new</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="err"> </span> <span class="err"> </span> <span class="n">psi_new</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">psi_new</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="err"> </span> <span class="err"> </span> <span class="n">curr_psi</span> <span class="o">=</span> <span class="n">psi_new</span>
+<span class="err"> </span> <span class="err"> </span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">save_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="n">psi</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_psi</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="testing">Testing</h2>
+
+<p>Instantiate an infinite potential square well and a Gaussian wavefunction in the centre, setting <span class="inline-math">$L = 1.0, N=200,T=200,\Delta t=0.01$</span>:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">L</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="c1"># domain size: [0,1]x[0,1]
+</span><span class="n">N</span> <span class="o">=</span> <span class="mi">200</span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="c1"># grid resolution
+</span><span class="n">T</span> <span class="o">=</span> <span class="mi">100</span>    <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span><span class="c1"># final time
+</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>    <span class="err"> </span><span class="c1"># time step
+</span><span class="p">...</span>
+<span class="n">psi</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+<span class="p">...</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">...</span>
+<span class="k">def</span> <span class="nf">init_psi</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">):</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">gauss</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="p">((</span><span class="n">X</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1j</span> <span class="o">*</span> <span class="p">(</span><span class="n">px</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">+</span> <span class="n">py</span> <span class="o">*</span> <span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)))</span>
+    <span class="n">psi</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">norm</span> <span class="o">*</span> <span class="n">gauss</span> <span class="o">*</span> <span class="n">phase</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And we obtain the following:</p>
+
+<div style="text-align:center">
+  <img src="/assets/images/2D_TDSE_sim_1.gif" alt="2D_TDSE_sim_1.gif" width="400px" />
+</div>
+
+<p>Clearly there are problems with the stability of the simulation. Below is plotted phase. Testing with <span class="inline-math">$\Delta t=0.005$</span> shows that phase data gradually diverges and outstrips resolution (see left side).</p>
+
+<div style="text-align:center">
+  <img src="/assets/images/2D_TDSE_sim_2.gif" alt="2D_TDSE_sim_2.gif" width="400px" />
+</div>
+
+<p>Not sure why - figure it’s something to do with the <span class="inline-math">$\omega=5\pi$</span>. Perhaps should downgrade a dimension first to check the theory is accurate: <em>See: [[1D TDSE Simulation]]</em></p>
+
+<p>Removed explicit reinforcing of Dirichlet condition + speed optimisations (<code class="language-plaintext highlighter-rouge">L2D.dot()</code> instead of <code class="language-plaintext highlighter-rouge">H @ psi</code>) + adding the <span class="inline-math">$\left( \frac{L}{N} \right)^2$</span> correction scalar on the Laplacian.</p>
+
+<div style="text-align:center">
+  <img src="/assets/images/2D_TDSE_sim_3.gif" alt="2D_TDSE_sim_3.gif" width="400px" />
+</div>
+
+<p>Clearly the Laplacian is incorrect, though the simulation already looks more stable. Didn’t notice the incorrect Laplacian since was explicitly reinforcing Dirichlet conditions anyway. I will switch back to a sparse Kronecker product: ^1a1cb2</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">laplacian_2d</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">L1D</span> <span class="o">=</span> <span class="n">sps</span><span class="p">.</span><span class="n">diags</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">)</span>
+    <span class="n">L2D</span> <span class="o">=</span> <span class="n">sps</span><span class="p">.</span><span class="n">kron</span><span class="p">(</span><span class="n">L1D</span><span class="p">,</span> <span class="n">sps</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">))</span>
+	    <span class="o">+</span> <span class="n">sps</span><span class="p">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sps</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">),</span> <span class="n">L1D</span><span class="p">)</span>
+    <span class="n">L2D</span> <span class="o">/=</span> <span class="p">(</span><span class="n">L</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">L2D</span>
+<span class="n">L2D</span> <span class="o">=</span> <span class="n">laplacian_2d</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>omg it works like the wave is expanding and it looks normal</p>
+
+<div style="text-align:center">
+  <img src="/assets/images/2D_TDSE_sim_4.gif" alt="2D_TDSE_sim_4.gif" width="400px" />
+</div>
+
+<h2 id="simulations">Simulations</h2>
+
+<h3 id="code">Code</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">scipy.integrate</span> <span class="k">as</span> <span class="n">spi</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="n">sps</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="n">animation</span>
+
+<span class="n">INF</span> <span class="o">=</span> <span class="mf">1e10</span>
+
+<span class="c1"># --- PARAMETERS ---
+</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">10.0</span>                <span class="c1"># domain size: [0,1]x[0,1]
+</span><span class="n">N</span> <span class="o">=</span> <span class="mi">200</span>                 <span class="c1"># grid resolution
+</span><span class="n">T</span> <span class="o">=</span> <span class="mi">2</span>                   <span class="c1"># final time (adjust as needed)
+</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.01</span>               <span class="c1"># time step
+</span><span class="k">def</span> <span class="nf">read_data</span><span class="p">():</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"sim.in"</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">det</span><span class="p">.</span><span class="n">readline</span><span class="p">().</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">det</span><span class="p">.</span><span class="n">readline</span><span class="p">().</span><span class="n">split</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span>
+<span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">read_data</span><span class="p">()</span>
+
+<span class="c1"># --- GRID ---
+</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">init_psi</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">):</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">gauss</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="p">((</span><span class="n">X</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1j</span> <span class="o">*</span> <span class="p">(</span><span class="n">px</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">+</span> <span class="n">py</span> <span class="o">*</span> <span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">norm</span> <span class="o">*</span> <span class="n">gauss</span> <span class="o">*</span> <span class="n">phase</span>
+<span class="k">def</span> <span class="nf">well</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">V</span>
+
+<span class="c1"># --- INITIALISE PSI/V ---
+</span>
+<span class="n">psi0</span> <span class="o">=</span> <span class="n">init_psi</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">).</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">well</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">).</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="c1"># --- CREATE LAPLACIAN OPERATOR ---
+</span>
+<span class="k">def</span> <span class="nf">laplacian_2d</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">L1D</span> <span class="o">=</span> <span class="n">sps</span><span class="p">.</span><span class="n">diags</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">)</span>
+    <span class="n">L2D</span> <span class="o">=</span> <span class="p">(</span><span class="n">sps</span><span class="p">.</span><span class="n">kron</span><span class="p">(</span><span class="n">L1D</span><span class="p">,</span> <span class="n">sps</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">))</span> <span class="o">+</span> <span class="n">sps</span><span class="p">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sps</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s">'csr'</span><span class="p">),</span> <span class="n">L1D</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">L</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">L2D</span>
+<span class="n">L2D</span> <span class="o">=</span> <span class="n">laplacian_2d</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># --- TIME INTEGRATION ---
+</span>
+<span class="k">def</span> <span class="nf">dpsi_dt</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">psin</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1j</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">L2D</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span> <span class="o">+</span> <span class="n">V</span> <span class="o">*</span> <span class="n">psi</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">psin</span>
+
+<span class="n">sol</span> <span class="o">=</span> <span class="n">spi</span><span class="p">.</span><span class="n">solve_ivp</span><span class="p">(</span><span class="n">dpsi_dt</span><span class="p">,</span> <span class="n">t_span</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">y0</span><span class="o">=</span><span class="n">psi0</span><span class="p">,</span> <span class="n">t_eval</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s">'RK23'</span><span class="p">)</span>
+<span class="n">psi</span> <span class="o">=</span> <span class="n">sol</span><span class="p">.</span><span class="n">y</span><span class="p">.</span><span class="n">T</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># --- VISUALISE ---
+</span>
+<span class="k">def</span> <span class="nf">create_visual</span><span class="p">():</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+    
+    <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">],</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis'</span><span class="p">,</span> 
+                <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">density</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cm_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">'red'</span><span class="p">:</span> <span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+        <span class="s">'green'</span><span class="p">:</span> <span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+        <span class="s">'blue'</span><span class="p">:</span> <span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+        <span class="s">'alpha'</span><span class="p">:</span> <span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+    <span class="p">}</span>
+    <span class="n">v_map</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="n">LinearSegmentedColormap</span><span class="p">(</span><span class="s">'v_map'</span><span class="p">,</span> <span class="n">cm_map</span><span class="p">)</span>
+    <span class="n">Vr</span> <span class="o">=</span> <span class="n">well</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+    <span class="n">im2</span> <span class="o">=</span> <span class="n">ax</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">Vr</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">],</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">v_map</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">Vr</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+    
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'Probability Density |ψ(x,y,t)|²'</span><span class="p">)</span>
+    <span class="n">time_txt</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="sa">f</span><span class="s">'t = </span><span class="si">{</span><span class="mi">0</span><span class="p">:.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="p">.</span><span class="n">transAxes</span><span class="p">,</span>
+                        <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s">'top'</span><span class="p">,</span>
+                        <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">im</span><span class="p">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">density</span><span class="p">)</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">density</span><span class="p">))</span>
+        <span class="n">im</span><span class="p">.</span><span class="n">set_norm</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
+        <span class="n">time_txt</span><span class="p">.</span><span class="n">set_text</span><span class="p">(</span><span class="sa">f</span><span class="s">'t = </span><span class="si">{</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">dt</span><span class="p">):.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">im</span><span class="p">,</span> <span class="n">im2</span><span class="p">,</span> <span class="n">time_txt</span><span class="p">]</span>
+
+    <span class="n">anim</span> <span class="o">=</span> <span class="n">animation</span><span class="p">.</span><span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">animate</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">psi</span><span class="p">),</span> <span class="n">interval</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">anim</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">'sim.gif'</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">create_visual</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>For all simulations, <span class="inline-math">$L=10.0\text{ m},\,N=10^3,\,dt=0.01,\,T=1\text{ s}$</span> unless otherwise specified.</p>
+
+<h3 id="reverse-slitblock-t15">Reverse-Slit/Block (<span class="inline-math">$T=1.5$</span>)</h3>
+
+<div style="text-align:center">
+  <img src="/assets/images/2D_TDSE_sim_6.gif" alt="2D_TDSE_sim_6.gif" />
+</div>
+
+<h3 id="double-slit">Double Slit</h3>
+
+<div style="text-align:center">
+  <img src="/assets/images/2D_TDSE_sim_7.gif" alt="2D_TDSE_sim_7.gif" />
+</div>
+
+<h3 id="single-slit">Single Slit</h3>
+
+<div style="text-align:center">
+  <img src="/assets/images/2D_TDSE_sim_8.gif" alt="2D_TDSE_sim_8.gif" />
+</div>
+
+    </main>
+</article>

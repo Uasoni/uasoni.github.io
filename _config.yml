@@ -33,5 +33,5 @@ posts:
 #     permalink: /:collection/:title:output_ext
 
 # Plugins
-plugins:
-  - jekyll-seo-tag
+# plugins:
+#   - jekyll-seo-tag
