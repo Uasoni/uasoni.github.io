@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Rapidity and Acceleration
+title: SR 1.6 - Rapidity and Acceleration
 tags: [SR, Notes]
 ---
 

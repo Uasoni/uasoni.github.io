@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Minkowski Diagrams
+title: SR 1.4 - Minkowski Diagrams
 tags: [SR, Notes]
 ---
 

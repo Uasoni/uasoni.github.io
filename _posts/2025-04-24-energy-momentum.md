@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Energy and Momentum
+title: SR 2.1 - Energy and Momentum
 tags: [SR, Notes]
 ---
 

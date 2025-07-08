@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Fundamental Effects
+title: SR 1.1 - Fundamental Effects
 tags: [SR, Notes]
 ---
 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Motivation and Setup
+title: SR 0 - Motivation and Setup
 tags: [SR, Notes]
 ---
 

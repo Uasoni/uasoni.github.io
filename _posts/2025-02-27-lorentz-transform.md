@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Lorentz Transformation
+title: SR 1.3 - Lorentz Transformation
 tags: [SR, Notes]
 ---
 
@@ -102,7 +102,8 @@ Switching between <span class="inline-math">$B_1$</span> and <span class="inline
 <div>
 $$\left( L, \frac{L}{v} \right) \to \left( 2L\gamma, \frac{L\gamma}{v} + Lv\gamma \right)$$
 </div>
- - note there is no extra elapsed 'time' of <span class="inline-math">$2Lv\gamma$</span> on <span class="inline-math">$B$</span>'s clock. The instantaneous gain of time resulting from changing planes of simultaneity goes unnoticed on <span class="inline-math">$B$</span>'s clock - precisely the resolution to the paradox. The home event in <span class="inline-math">$B_2$</span> is 
+
+Note there is no extra elapsed 'time' of <span class="inline-math">$2Lv\gamma$</span> on <span class="inline-math">$B$</span>'s clock. The instantaneous gain of time resulting from changing planes of simultaneity goes unnoticed on <span class="inline-math">$B$</span>'s clock - precisely the resolution to the paradox. The home event in <span class="inline-math">$B_2$</span> is 
 <div>
 $$\left( 0, \frac{2L}{v} \right) \to \left( 2L\gamma, \frac{2L\gamma}{v} \right)$$
 </div>

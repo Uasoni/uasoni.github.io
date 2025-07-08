@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Invariant Interval
+title: SR 1.5 - Invariant Interval
 tags: [SR, Notes]
 ---
 

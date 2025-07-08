@@ -19,9 +19,7 @@ exclude:
   - LICENSE
   - docker-compose.yml
 
-posts:
-  enabled: true
-  permalink: /:title:output_ext
+permalink: /:collection/:title
 
 kramdown:
   parse_span_html: false

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Special Relativity - Velocity Addition
+title: SR 1.2 - Velocity Addition
 tags: [SR, Notes]
 ---
 
