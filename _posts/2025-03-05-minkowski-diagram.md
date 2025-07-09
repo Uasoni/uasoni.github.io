@@ -4,11 +4,6 @@ title: SR 1.4 - Minkowski Diagrams
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: [[Lorentz Transformation]]; **Next**: [[Invariant Interval]]
-___
-
 ## Explanation
 
 Literally just geometry. Like draw crap and good luck. These don't solve new problems, but give a nicer visualisation.

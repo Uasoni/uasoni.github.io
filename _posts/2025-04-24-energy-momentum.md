@@ -4,11 +4,6 @@ title: SR 2.1 - Energy and Momentum
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: [[Rapidity and Acceleration]]; **Next**:
-___
-
 ## Expressions
 
 In relativistic dynamics,

@@ -18,6 +18,8 @@ exclude:
   - README.md
   - LICENSE
   - docker-compose.yml
+  - vendor
+  - _transfer
 
 permalink: /:collection/:title
 
@@ -36,3 +38,5 @@ kramdown:
 # Plugins
 # plugins:
 #   - jekyll-seo-tag
+#   - jekyll-sitemap
+#   - jekyll-feed

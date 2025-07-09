@@ -4,11 +4,6 @@ title: SR 1.1 - Fundamental Effects
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: [[Motivation and Setup]]; **Next**: [[Velocity Addition]]
-___
-
 ## Breaking Simultaneity
 
 Most intuitive effect. Consider a setup with two lightbulbs on either side of a person <span class="inline-math">$A$</span>, all at rest relative to an inertial frame moving in the direction of one of the lightbulbs. An observer <span class="inline-math">$B$</span> 'outside' of the frame sees all objects moving at speed <span class="inline-math">$v$</span>.
@@ -87,7 +82,7 @@ Clocks cannot run infinitely slow since <span class="inline-math">$t_S = \gamma 
 <div>
 $$\Delta t_{\text{obs}}=\gamma \Delta t_{\text{prop}}$$
 </div>
- - i.e. proper time doesn't 'transfer' across reference frames (definitionally tied to only one frame).
+i.e. proper time doesn't 'transfer' across reference frames (definitionally tied to only one frame).
 
 The other way to think about it would be time dilation states that the elapsed time between two events occurring *at the same location* in one frame is observed to be longer in another frame. Clock <span class="inline-math">$B$</span>'s ticks in <span class="inline-math">$S$</span>'s frame would not be at the same location, and vice-versa.
 

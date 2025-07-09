@@ -1,4 +1,11 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
 <head>
+    <!-- <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <title>SR 1.1 - Fundamental Effects</title>
     <!-- MathJax Configuration -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
     <script type="text/javascript">
@@ -12,9 +19,40 @@
             }
         };
     </script>
+    <script type="text/javascript" src="/assets/js/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/mathjax-config.js"></script>
 </head>
 
-<article>
+<body>
+    <div class="wrapper markdown-body">
+        <header class="site-header">
+    <a class="site-title" href="http://localhost:4000">Uasoni</a>
+    <div class="site-nav">
+    <nav>
+        
+            <a href="/" class="nav-item">
+            Home
+            </a>
+        
+            <a href="/about.html" class="nav-item">
+            About
+            </a>
+        
+            <a href="/projects.html" class="nav-item">
+            Projects
+            </a>
+        
+            <a href="/posts.html" class="nav-item">
+            Posts
+            </a>
+        
+    </nav>
+</div>
+    <!-- <a id="theme-toggle" class="toggle-icon" onclick="modeSwitcher()"></a> -->
+</header>
+
+        <main>
+            <article>
     <main>
         <h1 class="post-title">SR 1.1 - Fundamental Effects</h1>
         <time datetime="2025-02-17T00:00:00+11:00" class="post-date">February 17, 2025</time>
@@ -104,9 +142,7 @@ $$t_S=\frac{c}{\sqrt{c^2-v^2}}=\boxed{\frac{1}{\sqrt{1-\frac{v^2}{c^2}}}}=\gamma
 <div>
 $$\Delta t_{\text{obs}}=\gamma \Delta t_{\text{prop}}$$
 </div>
-<ul>
-  <li>i.e. proper time doesn’t ‘transfer’ across reference frames (definitionally tied to only one frame).</li>
-</ul>
+<p>i.e. proper time doesn’t ‘transfer’ across reference frames (definitionally tied to only one frame).</p>
 
 <p>The other way to think about it would be time dilation states that the elapsed time between two events occurring <em>at the same location</em> in one frame is observed to be longer in another frame. Clock <span class="inline-math">$B$</span>’s ticks in <span class="inline-math">$S$</span>’s frame would not be at the same location, and vice-versa.</p>
 
@@ -228,3 +264,10 @@ $$L'_x=\frac{L_x}{\gamma},L'_y=L_y\implies\theta'=\tan^{-1}\left(\gamma\frac{L_y
 
     </main>
 </article>
+        </main>
+
+        <footer class="site-footer">
+    <p>&copy; 2025 Austin Song. All rights reserved.</p>
+</footer>
+    </div>
+</html>

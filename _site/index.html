@@ -1,4 +1,58 @@
-<article id="home">
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <!-- <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <title>Home</title>
+    <!-- MathJax Configuration -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+    <script type="text/javascript">
+        MathJax = {
+            tex: { // this is just how Jekyll outputs different math delimiters :(
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/mathjax-config.js"></script>
+</head>
+
+<body>
+    <div class="wrapper markdown-body">
+        <header class="site-header">
+    <a class="site-title" href="http://localhost:4000">Uasoni</a>
+    <div class="site-nav">
+    <nav>
+        
+            <a href="/" class="nav-item active">
+            Home
+            </a>
+        
+            <a href="/about.html" class="nav-item">
+            About
+            </a>
+        
+            <a href="/projects.html" class="nav-item">
+            Projects
+            </a>
+        
+            <a href="/posts.html" class="nav-item">
+            Posts
+            </a>
+        
+    </nav>
+</div>
+    <!-- <a id="theme-toggle" class="toggle-icon" onclick="modeSwitcher()"></a> -->
+</header>
+
+        <main>
+            <article id="home">
     <main>
         <h2 id="hi">Hi</h2>
 
@@ -52,3 +106,10 @@
         </ul>
     </section>
 </article>
+        </main>
+
+        <footer class="site-footer">
+    <p>&copy; 2025 Austin Song. All rights reserved.</p>
+</footer>
+    </div>
+</html>

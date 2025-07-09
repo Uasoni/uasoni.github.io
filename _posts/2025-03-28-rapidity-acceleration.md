@@ -4,11 +4,6 @@ title: SR 1.6 - Rapidity and Acceleration
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: [[Invariant Interval]]; **Next**: [[Energy and Momentum]]
-___
-
 ## Rapidity
 
 Define <span class="inline-math">$\phi$</span> as rapidity where <span class="inline-math">$\tanh \phi=v$</span>. Note that the velocity addition formula then reduces to

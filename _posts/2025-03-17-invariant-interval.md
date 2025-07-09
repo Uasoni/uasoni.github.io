@@ -4,11 +4,6 @@ title: SR 1.5 - Invariant Interval
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: [[Minkowski Diagrams]]; **Next**: [[Rapidity and Acceleration]]
-___
-
 ## Minkowski Distance
 
 Distance on the Minkowski diagram (using <span class="inline-math">$x$</span> and <span class="inline-math">$ct$</span> axes) is given by 

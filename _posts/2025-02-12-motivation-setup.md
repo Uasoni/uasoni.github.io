@@ -4,11 +4,6 @@ title: SR 0 - Motivation and Setup
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: N/A; **Next**: [[Fundamental Effects]]
-___
-
 ## Materials
 
 Using a combination of Wang/Ricardo *Competitive Physics* and Morin's *Special Relativity for the Enthusiastic Beginner*.

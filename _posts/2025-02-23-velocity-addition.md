@@ -4,11 +4,6 @@ title: SR 1.2 - Velocity Addition
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: [[Fundamental Effects]]; **Next**: [[Lorentz Transformation]]
-___
-
 ## Toy Problem
 
 In some frame <span class="inline-math">$S$</span>, there exists a frame <span class="inline-math">$S'$</span> moving at speed <span class="inline-math">$v$</span>. In frame <span class="inline-math">$S'$</span>, some object moves at speed <span class="inline-math">$u$</span>. The problem is to find the measured speed of this object in <span class="inline-math">$S$</span>.

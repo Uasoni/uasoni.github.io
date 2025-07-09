@@ -4,11 +4,6 @@ title: SR 1.3 - Lorentz Transformation
 tags: [SR, Notes]
 ---
 
-## Navigation
-
-**Previous**: [[Velocity Addition]]; **Next**: [[Minkowski Diagrams]]
-___
-
 ## Derivation
 
 Consider a frame <span class="inline-math">$S'$</span> moving at some speed <span class="inline-math">$v$</span> in the positive x direction relative to another frame <span class="inline-math">$S$</span>. We aim to find a transformation such that we can write coordinates <span class="inline-math">$(x,t)$</span> in <span class="inline-math">$S$</span> in terms of <span class="inline-math">$(x',t')$</span> in <span class="inline-math">$S'$</span>. Specifically, 
