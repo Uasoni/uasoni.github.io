@@ -1,0 +1,67 @@
+---
+layout: default
+---
+
+<article>
+    <main>
+        {{ content }}
+    </main>
+    <section>
+        <!-- add a filtering system which displays all tags, and allows users to filter posts by tag by clicking, selecting multiple tags -->
+        <div class="tag-filter">
+            <h3>Filter by Tags:</h3>
+            <ul id="tag-filters">
+                {% assign all_tags = site.tags | sort %}
+                {% for tag in all_tags %}
+                <li>
+                    <button class="tag-btn" data-tag="{{ tag[0] }}">{{ tag[0] }} ({{ tag[1].size }})</button>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="post-list">
+            {% for post in site.posts %}
+            <article class="post-list-item" data-tags="{{ post.tags | join: "," }}">
+                <a class="post-list-heading" href="{{ post.url }}">{{ post.title }}</a>
+                <time datetime="{{ post.date | date_to_xmlschema }}" class="post-list-date">({{ post.date | date: "%B %e, %Y" }})</time>
+                <p class="post-list-excerpt">{{ post.content | strip_html | truncate: 300 }}</p>
+                <p class="post-tags">Tags:
+                    {% for t in post.tags %}
+                    <span class="post-tag">{{ t }}</span>{% unless forloop.last %}, {% endunless %}
+                    {% endfor %}
+                </p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+</article>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectedTags = new Set();
+        const buttons = document.querySelectorAll('.tag-btn');
+        const posts = document.querySelectorAll('.post-list-item');
+
+        function updateFilters() {
+            posts.forEach(post => {
+                const postTags = post.dataset.tags.split(',');
+                const show = [...selectedTags].every(tag => postTags.includes(tag));
+                post.style.display = (selectedTags.size === 0 || show) ? '' : 'none';
+            });
+        }
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tag = btn.dataset.tag;
+                if (selectedTags.has(tag)) {
+                    selectedTags.delete(tag);
+                    btn.classList.remove('active');
+                } else {
+                    selectedTags.add(tag);
+                    btn.classList.add('active');
+                }
+                updateFilters();
+            });
+        });
+    });
+</script>

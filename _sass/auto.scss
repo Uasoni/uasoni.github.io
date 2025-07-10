@@ -19,7 +19,8 @@ $lm-site-title-color: $lm-brand-color-dark !default;
 
 $lm-heading-color: #111111 !default;
 $lm-text-color: $lm-brand-color-dark !default;
-$lm-background-color: #fdfdfd !default;
+$lm-text-color-inverse: invert($lm-text-color) !default;
+$lm-background-color: #e0e0e0e0 !default;
 $lm-code-background-color: #f6f8fa !default;
 
 $lm-link-base-color: #1e69d8 !default;
@@ -379,6 +380,7 @@ $dm-site-title-color: $dm-brand-color-light !default;
 
 $dm-heading-color: #bbbbbb !default;
 $dm-text-color: darken($dm-heading-color, 15%) !default;
+$dm-text-color-inverse: invert($dm-text-color) !default;
 $dm-background-color: #181818 !default;
 $dm-code-background-color: #222222 !default;
 
@@ -747,6 +749,7 @@ $site-title-color: $lm-site-title-color;
 
 $heading-color: $lm-heading-color;
 $text-color: $lm-text-color;
+$text-color-inverse: $lm-text-color-inverse;
 $background-color: $lm-background-color;
 $code-background-color: $lm-code-background-color;
 
@@ -779,6 +782,7 @@ $table-border-color: $lm-table-border-color;
 
         --minima-heading-color: #{$lm-heading-color};
         --minima-text-color: #{$lm-text-color};
+        --minima-text-color-inverse: #{$lm-text-color-inverse};
         --minima-background-color: #{$lm-background-color};
         --minima-code-background-color: #{$lm-code-background-color};
 
@@ -810,6 +814,7 @@ $table-border-color: $lm-table-border-color;
 
             --minima-heading-color: #{$dm-heading-color};
             --minima-text-color: #{$dm-text-color};
+            --minima-text-color-inverse: #{$dm-text-color-inverse};
             --minima-background-color: #{$dm-background-color};
             --minima-code-background-color: #{$dm-code-background-color};
 
@@ -840,6 +845,7 @@ $table-border-color: $lm-table-border-color;
 
     $heading-color: var(--minima-heading-color);
     $text-color: var(--minima-text-color);
+    $text-color-inverse: var(--minima-text-color-inverse);
     $background-color: var(--minima-background-color);
     $code-background-color: var(--minima-code-background-color);
 
@@ -873,6 +879,7 @@ $table-border-color: $lm-table-border-color;
 
     $heading-color: $dm-heading-color;
     $text-color: $dm-text-color;
+    $text-color-inverse: $dm-text-color-inverse;
     $background-color: $dm-background-color;
     $code-background-color: $dm-code-background-color;
 
