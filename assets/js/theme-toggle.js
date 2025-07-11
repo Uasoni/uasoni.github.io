@@ -1,14 +1,17 @@
 const toggle = document.getElementById('theme-toggle');
 const root = document.documentElement;
-const key = 'my-site-theme';
 
-const saved = localStorage.getItem(key);
-if (saved) root.setAttribute('data-theme', saved);
+var currentTheme = root.style.getPropertyValue('--color-scheme') || 'dark';
+if (root.style.getPropertyValue('--color-scheme-auto') === 'true') {
+    currentTheme = root.style.getPropertyValue('--color-scheme') || 'dark';
+}
 
-toggle?.addEventListener('click', e => {
-    e.preventDefault();
-    const current = root.getAttribute('data-theme') || 'light';
-    const next = current === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    localStorage.setItem(key, next);
+toggle.addEventListener('click', () => {
+    if (currentTheme === 'dark') {
+        root.style.setProperty('--color-scheme', 'light');
+        root.style.setProperty('--color-scheme-auto', 'false');
+    } else {
+        root.style.setProperty('--color-scheme', 'dark');
+        root.style.setProperty('--color-scheme-auto', 'false');
+    }
 });

@@ -4,6 +4,10 @@ title: SR 0 - Motivation and Setup
 tags: [SR, Notes]
 ---
 
+## About
+
+This is the first post in a series of posts on special relativity, asked for by a friend. Is this a good learning resource? Not really. I would recommend actually going through the textbooks, but I guess this is a decent suppelement/reading guide.
+
 ## Materials
 
 Using a combination of Wang/Ricardo *Competitive Physics* and Morin's *Special Relativity for the Enthusiastic Beginner*.

@@ -4,14 +4,24 @@ title: About
 ---
 
 # About
-Hi. I'm like trying to get stuff to work right now so this site kinda sucks but it's fine type beat
+I'm sure you'll be amazed to learn that this page is about things. Aptly named, I know.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque a ipsum et quam varius rutrum a eget arcu. Mauris in massa maximus felis semper venenatis ut sed mi. Praesent sollicitudin condimentum ipsum fringilla feugiat. Nulla euismod at ipsum sit amet vulputate. Suspendisse nec purus sit amet libero rhoncus gravida. Sed dictum elit nibh, nec mattis turpis euismod quis. Vestibulum ut lacinia dui. Mauris tincidunt ex ligula, elementum tincidunt ipsum placerat a. Aliquam porttitor aliquet fringilla. Proin eu lorem euismod, sodales libero vitae, commodo justo. Sed mattis faucibus tortor.
+## About Me
+Hi :)
 
-Pellentesque dictum neque sed imperdiet bibendum. Phasellus porttitor felis leo, non iaculis ex finibus non. Phasellus sit amet diam quam. In sit amet dui orci. Morbi porta nunc sed laoreet ullamcorper. Maecenas efficitur fringilla tortor, non eleifend ex facilisis ut. Sed nec nisi ac mauris venenatis vulputate. Ut sagittis arcu feugiat, ultricies lorem vel, euismod enim. Nam mattis quis augue ac laoreet. Maecenas pellentesque placerat diam id dignissim.
+## About This Site
+I'm generally using this site to share stuff I've done - sort of to localise various projects and digital trinkets. The graphics are lowkey terrible but I'm like not a graphic designer.
 
-## Curabitur?
+### Meta-Information
+This site is built using [Jekyll](https://jekyllrb.com/) and hosted on GitHub Pages. The source code is available on [GitHub](github.com/Uasoni/uasoni.github.io). TeX is rendered using [MathJax](https://www.mathjax.org/).
 
-Curabitur at tortor in ante venenatis fermentum vel eget elit. Vestibulum eget mattis ipsum. Aliquam volutpat interdum est, sit amet tincidunt diam pellentesque quis. Nullam blandit, elit vitae aliquet luctus, nisi enim auctor libero, vel mattis nibh tortor non massa. Mauris ornare posuere augue, sit amet semper odio consequat ut. Pellentesque convallis dolor tortor, quis pulvinar sapien aliquam at. Suspendisse ut elementum ante. Sed tellus orci, malesuada ut purus a, tincidunt elementum enim. Etiam eget mauris blandit, mollis nisl in, condimentum urna. Cras a quam lorem. Aliquam sollicitudin urna felis, sed dapibus ex posuere quis. Maecenas lacinia tristique elementum. Donec ut est in ipsum condimentum euismod at in justo. Donec at iaculis elit, in efficitur mauris. Phasellus aliquet in mi ut sollicitudin. Aenean pretium sodales consectetur.
+### About
+You can find information about various things in the [About](/about) page. (recursion!)
 
-Aliquam eget ante diam. In pretium velit erat. Sed consequat augue bibendum arcu interdum viverra at in tellus. Quisque mollis tempus urna, vel aliquam nunc fringilla eget. Aenean finibus volutpat lacus id iaculis. Sed at magna ante. Pellentesque blandit ac lacus sed ornare. Duis laoreet eu metus sed posuere. Nunc eu nisi viverra, imperdiet ex et, aliquam turpis. Duis vel ultrices est, non suscipit ipsum. Sed at nibh arcu. Morbi congue arcu id libero commodo, elementum consectetur leo dignissim. Proin porta vitae sapien vel gravida. Praesent eget ultricies nunc. Donec tristique augue quis arcu euismod tempus.
+### Posts
+You can find stuff I've written on the [Posts](/posts) page. It differs slightly from standard online blogs, since most of the posts in there are less audience-focused (you know, like "we" and "you" and all the standard audience-engagement techniques we learnt when writing opinion pieces), and more like a compilation of sparse contemplations I wanted to share.
+
+Most of these are just transferred notes/journals. Usually these are things my friends have asked me about/for, or things I thought were interesting enough to write about. A gamut of topics, really.
+
+### Projects
+You can find some of the projects I've worked on in the [Projects](/projects) page. A lot of projects are also localised in the post section, but I'll put some of the more significant ones here, as well as finalised versions of some of the experimental posts.

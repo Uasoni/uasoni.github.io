@@ -44,6 +44,11 @@
             margin-right: $spacing-unit * 0.5;
         }
     }
+    .nav-item.active {
+        color: $brand-color;
+        font-weight: 600;
+        border-bottom: 2px solid $brand-color;
+    }
 
     @include media-query($on-medium) {
         position: absolute;
@@ -119,11 +124,6 @@
             color: $text-color;
             line-height: $base-line-height;
         }
-
-        .active {
-            font-weight: 600;
-            color: $brand-color;
-        }
     }
 }
 
@@ -131,7 +131,8 @@
     display: flex;
     justify-content: space-between;
     margin-top: $spacing-unit * 0.5;
-    padding: 0 $spacing-unit;
+    padding-top: 0;
+    padding-bottom: $spacing-unit * 0.5;
 
     a {
         color: $brand-color-dimmed;
