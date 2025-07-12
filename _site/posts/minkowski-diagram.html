@@ -19,10 +19,48 @@
             }
         };
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/fluid-canvas@latest"></script>
     <!-- <script src="/assets/js/theme-toggle.js"></script> -->
 </head>
 
 <body>
+    <canvas id="render-fluid"></canvas>
+    <script>
+        const canvas = document.getElementById('render-fluid');
+        // function resize() {
+        //     const w = window.innerWidth;
+        //     const h = Math.max(
+        //         document.body.scrollHeight,
+        //         document.documentElement.scrollHeight,
+        //         // document.documentElement.clientHeight
+        //     );
+        //     canvas.width  = w;
+        //     canvas.height = h;
+        // }
+        // resize();
+        
+        let fluid = new Fluid(canvas);
+        fluid.mapBehaviors({
+            dissipation: .97,
+            velocity: .98,
+            pressure: .8,
+            presure_iteration: 20,
+
+            render_bloom: false,
+            bloom_iterations: 8,
+            bloom_resolution: 512,
+            intensity: 0.8,
+            threshold: 0.5,
+
+            transparent: true,
+        });
+        var r = document.querySelector(':root');
+        var col = getComputedStyle(r).getPropertyValue('--minima-background-color').trim();
+        fluid.applyBackground('solid', col);
+
+        fluid.activate();
+    </script>
+
     <div class="wrapper markdown-body">
         <header class="site-header">
     <a class="site-title" href="http://localhost:4000">Uasoni</a>

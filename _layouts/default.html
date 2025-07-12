@@ -4,6 +4,32 @@
 {% include head.html %}
 
 <body>
+    <canvas id="render-fluid"></canvas>
+    <script>
+        const canvas = document.getElementById('render-fluid');
+        
+        let fluid = new Fluid(canvas);
+        fluid.mapBehaviors({
+            dissipation: .97,
+            velocity: .98,
+            pressure: .8,
+            presure_iteration: 20,
+
+            render_bloom: false,
+            bloom_iterations: 8,
+            bloom_resolution: 512,
+            intensity: 0.8,
+            threshold: 0.5,
+
+            transparent: true,
+        });
+        var r = document.querySelector(':root');
+        var col = getComputedStyle(r).getPropertyValue('--minima-background-color').trim();
+        fluid.applyBackground('solid', col);
+
+        fluid.activate();
+    </script>
+
     <div class="wrapper markdown-body">
         {% include header.html %}
 
