@@ -13,7 +13,7 @@ Hi :)
 I'm generally using this site to share stuff I've done - sort of to localise various projects and digital trinkets. The graphics are lowkey terrible but I'm like not a graphic designer.
 
 ### Meta-Information
-This site is built using [Jekyll](https://jekyllrb.com/) and hosted on GitHub Pages. The source code is available on [GitHub](github.com/Uasoni/uasoni.github.io). TeX is rendered using [MathJax](https://www.mathjax.org/).
+This site is built using [Jekyll](https://jekyllrb.com/) and hosted on GitHub Pages. The source code is available on [GitHub](https://github.com/Uasoni/uasoni.github.io). TeX is rendered using [MathJax](https://www.mathjax.org/).
 
 ### About
 You can find information about various things in the [About](/about) page. (recursion!)
@@ -25,3 +25,6 @@ Most of these are just transferred notes/journals. Usually these are things my f
 
 ### Projects
 You can find some of the projects I've worked on in the [Projects](/projects) page. A lot of projects are also localised in the post section, but I'll put some of the more significant ones here, as well as finalised versions of some of the experimental posts.
+
+### Background
+You might have noticed the fluid simulation running in the background. It's a WebGL fluid simulation powered by the [Fluid-JS](https://github.com/malik-tillman/Fluid-JS) library. Try dragging! As far as I know this doesn't work on mobile or smaller screens where you can't actually see the background.

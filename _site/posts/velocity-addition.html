@@ -2,8 +2,8 @@
 <html lang="en-US">
 
 <head>
-    <!-- <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/style.css">
     <title>SR 1.2 - Velocity Addition</title>
     <!-- MathJax Configuration -->
@@ -27,17 +27,6 @@
     <canvas id="render-fluid"></canvas>
     <script>
         const canvas = document.getElementById('render-fluid');
-        // function resize() {
-        //     const w = window.innerWidth;
-        //     const h = Math.max(
-        //         document.body.scrollHeight,
-        //         document.documentElement.scrollHeight,
-        //         // document.documentElement.clientHeight
-        //     );
-        //     canvas.width  = w;
-        //     canvas.height = h;
-        // }
-        // resize();
         
         let fluid = new Fluid(canvas);
         fluid.mapBehaviors({
@@ -46,19 +35,20 @@
             pressure: .8,
             presure_iteration: 20,
 
-            render_bloom: false,
-            bloom_iterations: 8,
-            bloom_resolution: 512,
-            intensity: 0.8,
-            threshold: 0.5,
+            paused: false,
+
+            render_bloom: true,
+            bloom_iterations: 10,
+            bloom_resolution: 256,
+            intensity: 0.2,
+            threshold: 0.2,
 
             transparent: true,
         });
-        var r = document.querySelector(':root');
-        var col = getComputedStyle(r).getPropertyValue('--minima-background-color').trim();
-        fluid.applyBackground('solid', col);
 
         fluid.activate();
+
+        canvas.style.height = '100%';
     </script>
 
     <div class="wrapper markdown-body">
