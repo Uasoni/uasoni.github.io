@@ -3,7 +3,7 @@
 // Default color scheme settings
 // These are overridden in classic.css and dark.scss
 
-$color-scheme-auto: true !default;
+$color-scheme-auto: false !default;
 $color-scheme-dark: false !default;
 
 
@@ -20,7 +20,7 @@ $lm-site-title-color: $lm-brand-color-dark !default;
 $lm-heading-color: #111111 !default;
 $lm-text-color: $lm-brand-color-dark !default;
 $lm-text-color-inverse: invert($lm-text-color) !default;
-$lm-background-color: #e0e0e0e0 !default;
+$lm-background-color: #e0e0e0 !default;
 $lm-code-background-color: #f6f8fa !default;
 
 $lm-link-base-color: #1e69d8 !default;

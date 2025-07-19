@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────────
-MD_ROOT      = Path('./parser/')   # ← adjust this
+MD_ROOT      = Path('./_transfer/parser/')   # ← adjust this
 IMG_BASE_URL = '/assets/images'
 # ────────────────────────────────────────────────────────────────────────────────
 
