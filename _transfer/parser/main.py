@@ -10,7 +10,7 @@ IMG_BASE_URL = '/assets/images'
 
 NOTE_LINE_RE   = re.compile(r'\[!note\]', re.IGNORECASE)
 # Capture obsidian ![[fname|width]] embeds
-OBS_IMAGE_RE   = re.compile(r'!\[\[([^|\]]+)(?:\|(\d+))?\]\]')
+OBS_IMAGE_RE   = re.compile(r'!\[\[([^|\]]+)(?:\|(?:center\|)?(\d+))?\]\]', re.IGNORECASE)
 INLINE_MATH_RE = re.compile(r'\$(?!\$)(.+?)(?<!\$)\$', re.DOTALL)
 DISPLAY_SPLIT  = re.compile(r'(\$\$.+?\$\$)', re.DOTALL)
 HEADING_RE     = re.compile(r'^(#{1,6}\s+.*)$')

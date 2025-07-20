@@ -1,9 +1,3 @@
----
-layout: post
-title: "Computational EM - Setup"
-tags: [Computational Physics, EM]
----
-
 ## Maxwell's Equations
 
 The microscopic formulation of Maxwell's equations are fairly well-known:
@@ -141,7 +135,7 @@ The **finite-difference time-domain** method is typically used:
 
 
 <div style="text-align:center">
-  <img src="/assets/images/FDTD_flowchart.png" alt="FDTD_flowchart.png" width="600px" />
+  <img src="/assets/images/FDTD_flowchart.png" alt="FDTD_flowchart.png" />
 </div>
 
 

@@ -60,7 +60,9 @@ $$\displaystyle \nabla \times \mathbf {F} =\left({\frac {\partial F_{z}}{\partia
 We use this to specify the curl part of the update equation depending on the dimensions the simulation ends up running in.
 ## FDTD Algorithmic Overview
 
-![[FDTD_flowchart.png|600]]
+The **finite-difference time-domain** method is typically used:
+
+![[FDTD_flowchart.png]]
 
 It is easy to see why we do H before E (H takes half steps and is only dependent on $\mathbf E(t)$ and $\mathbf H( t-\frac{dt}{2} )$, while E is dependent on $\mathbf H( t+\frac{dt}{2} )$ as well as the E/H fields at previous times).
 
@@ -68,15 +70,22 @@ For more complex non-isotropic/non-linear materials the constitutive relations n
 ## Yee Grid
 ### Motivation
 Consider a grid cell. It is standard and tempting to format the grid as shown:
-![[FDTD_collocated.png|400]]
+![[FDTD_collocated.png|center|400]]
 However, this has problems (I'll take Yee at his word). Basically, stagger the position of the field components, instead of focusing them at a corner:
-![[FDTD_yee.png|400]]
+![[FDTD_yee.png|center|400]]
 Turns out this has three major benefits:
 1. **Divergence free field**. We only looked at the curl eqns., but turns out that by using this grid, the divergence equations (the two Gauss's laws) are naturally satisfied - that is, $\nabla \cdot \mathbf B = 0, \, \nabla \cdot \mathbf D = 0$ (assuming $\mathbf J_f,\, \rho_f=0$)
 2. **Emergent boundary conditions**. Material boundaries are naturally dealt with (so we don't have to manually write code to handle the boundary conditions).
-3. **Curl simplification**. Notice that with the staggered grid, ![[FDTD_curl_diagram.png|400]] - that is, H fields wrap around E fields and vice versa. This is the exact construction we want in order to approximate curl easily.
+3. **Curl simplification**. Notice that with the staggered grid, ![[FDTD_curl_diagram.png|center|400]] - that is, H fields wrap around E fields and vice versa. This is the exact construction we want in order to approximate curl easily.
 
 For 2D and 1D Yee grids, Maxwell's equations decouple into two modes (H and E) - i.e. they form two sets of equations (component-wise) with **no** shared terms between them.
 ### Consequences
 Since the H and E field components within one grid cell represent *different positions*, it means there is **phase offset** - this needs to be taken into account when injecting sources.
-## 1D Simulation
+## Normalisation
+
+E and H fields differ by several orders of magnitude. To avoid numerical drift, we normalise:
+$$\mathbf{\tilde H}=\sqrt{\frac{\mu_0}{\varepsilon_0}}\cdot\mathbf H$$
+i.e., the curl equations become
+$$\nabla \times \mathbf E = -\frac{\mu}{c_0} \frac{ \partial \mathbf{\tilde H} }{ \partial t}$$
+$$\nabla \times \mathbf{\tilde H}=\frac{\varepsilon}{c_0}\frac{ \partial \mathbf E }{ \partial t } $$
+Subsequently $\mathbf H \coloneqq \mathbf{\tilde H}$ because of laziness.
