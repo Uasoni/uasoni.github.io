@@ -4,7 +4,7 @@ title: About
 ---
 
 # About
-I'm sure you'll be amazed to learn that this page is about things. Aptly named, I know.
+This page contains information.
 
 ## About Me
 Hi :)
