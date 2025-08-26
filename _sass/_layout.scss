@@ -280,7 +280,10 @@
     @include relative-font-size(1.5);
 }
 
-
+mjx-container[jax="CHTML"][display="true"] {
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
 
 /**
  * Posts
