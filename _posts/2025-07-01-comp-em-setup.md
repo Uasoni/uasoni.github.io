@@ -122,6 +122,7 @@ $$\frac{\mathbf H \left( t+\frac{dt}{2} \right) - \mathbf H \left( t-\frac{dt}{2
 $$\frac{\mathbf E(t+dt)-\mathbf E(t)}{dt}=\frac{1}{\varepsilon}\left( \nabla \times \mathbf H\left( t+\frac{dt}{2} \right) \right) \implies \boxed{\mathbf E(t+dt)=\mathbf E(t)+\frac{dt}{\varepsilon}\left( \nabla \times \mathbf H\left( t+\frac{dt}{2} \right) \right)}$$
 </div>
 
+Notice how the first update equation lives at <span class="inline-math">$\left( i,j,k;t\right)$</span> and the second update equation lives at <span class="inline-math">$\left( i,j,k;t+\frac{dt}{2} \right)$</span>. It is important that all terms in each update equation eventually result in those positions and times. This also suggests the order in which these update equations will be executed - first integer times, then half-integer times.
 
 The curl operator mnemonic/definition for generalised coordinates is is:
 
@@ -193,12 +194,12 @@ $$\mathbf{\tilde H}=\sqrt{\frac{\mu_0}{\varepsilon_0}}\cdot\mathbf H$$
 i.e., the curl equations become
 
 <div>
-$$\nabla \times \mathbf E = -\frac{\mu}{c_0} \frac{ \partial \mathbf{\tilde H} }{ \partial t}$$
+$$\nabla \times \mathbf E = -\frac{\mu_r}{c_0} \frac{ \partial \mathbf{\tilde H} }{ \partial t}$$
 </div>
 
 
 <div>
-$$\nabla \times \mathbf{\tilde H}=\frac{\varepsilon}{c_0}\frac{ \partial \mathbf E }{ \partial t } $$
+$$\nabla \times \mathbf{\tilde H}=\frac{\varepsilon_r}{c_0}\frac{ \partial \mathbf E }{ \partial t } $$
 </div>
 
-where <span class="inline-math">$\varepsilon$</span> and <span class="inline-math">$\mu$</span> are the relative permittivity/permeability constants of the material.
+where <span class="inline-math">$\varepsilon_r$</span> and <span class="inline-math">$\mu_r$</span> are the relative permittivity/permeability constants of the material.
