@@ -26,8 +26,5 @@ You can find stuff I've written on the [Posts](/posts) page. It differs slightly
 
 Most of these are just transferred notes/journals. Usually these are things my friends have asked me about/for, or things I thought were interesting enough to write about - a gamut of topics.
 
-### Projects
-You can find some of the projects I've worked on in the [Projects](/projects) page. A lot of projects are also localised in the post section, but I'll put some of the more significant ones here, as well as finalised versions of some of the experimental posts.
-
 ### Background
 You might have noticed the fluid simulation running in the background. It's a WebGL fluid simulation powered by the [Fluid-JS](https://github.com/malik-tillman/Fluid-JS) library. Try dragging! As far as I know this doesn't work on mobile or smaller screens where you can't actually see the background.
