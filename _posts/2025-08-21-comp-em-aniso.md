@@ -303,7 +303,11 @@ $$
 $$
 </div>
 
-(Recall that <span class="inline-math">$C_x^{\tilde H}(t)=\frac{\tilde H_z^{i,j+\frac{1}{2},k}\left( t+\frac{dt}{2} \right) - \tilde H_z^{i,j-\frac{1}{2},k}\left( t+\frac{dt}{2} \right)}{dy} - \frac{\tilde H_y^{i,j,k+\frac{1}{2}}\left( t+\frac{dt}{2} \right)-\tilde H_y^{i,j,k-\frac{1}{2}}\left( t+\frac{dt}{2} \right)}{dz}$</span> - i.e. lives at positional coordinates <span class="inline-math">$(i,j,k)$</span> with time at <span class="inline-math">$t+\frac{dt}{2}$</span>).
+Recall that 
+<div>
+$$C_x^{\tilde H}(t)=\frac{\tilde H_z^{i,j+\frac{1}{2},k}\left( t+\frac{dt}{2} \right) - \tilde H_z^{i,j-\frac{1}{2},k}\left( t+\frac{dt}{2} \right)}{dy} - \frac{\tilde H_y^{i,j,k+\frac{1}{2}}\left( t+\frac{dt}{2} \right)-\tilde H_y^{i,j,k-\frac{1}{2}}\left( t+\frac{dt}{2} \right)}{dz}$$
+</div>
+- i.e. lives at positional coordinates <span class="inline-math">$(i,j,k)$</span> with time at <span class="inline-math">$t+\frac{dt}{2}$</span>.
 
 From this equation it is possible to rearrange for <span class="inline-math">$E_x^{i,j,k}(t+dt)$</span> which completes the update equation for <span class="inline-math">$E_x$</span>.
 

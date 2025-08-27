@@ -28,3 +28,7 @@ Most of these are just transferred notes/journals. Usually these are things my f
 
 ### Background
 You might have noticed the fluid simulation running in the background. It's a WebGL fluid simulation powered by the [Fluid-JS](https://github.com/malik-tillman/Fluid-JS) library. Try dragging! As far as I know this doesn't work on mobile or smaller screens where you can't actually see the background.
+
+### Known Issues
+- The site is not made for mobile. Some elements may not display properly on smaller screens.
+- If inline math (like <span class="inline-math">$x^2 + y^2 = z^2$</span>) doesn't render, try manually refreshing the page.
