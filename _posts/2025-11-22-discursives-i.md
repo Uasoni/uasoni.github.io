@@ -5,6 +5,7 @@ tags: [Musings, Time Capsule]
 ---
 
 ## About
+
 This is the first post of a set of two posts containing discursives I wrote as practice for the High School Certificate (HSC) Advanced English module 'The Craft of Writing' in 2024-2025. Hopefully I said some interesting things.
 
 ## Ontogenic Recontextualisation of the Imaginary via Pseudo-Intellectual Semiotic Inscription

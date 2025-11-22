@@ -5,7 +5,8 @@ tags: [Musings, Time Capsule]
 ---
 
 ## About
-This is the second post of the highschool discursives set. Some common examples might be shared across individual pieces, but that's just as per the nature of exam practice.
+
+This is the second post of the highschool discursives set. There's repetition of certain phrases/examples as they are shared across individual pieces - but that's just as per the nature of exam practice.
 
 ## “Plunging into the void” – On the modern Hero’s Journey
 
